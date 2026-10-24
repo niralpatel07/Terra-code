@@ -57,20 +57,117 @@
             border-radius: 8px;
             margin-bottom: 8px;
         }
+        .clear {
+            background: #e53e3e;
+            margin-top: 12px;
+        }
+        p {
+            color: #4a5568;
+        }
+        body {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        .card {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+        }
+        button {
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #4338ca;
+            transform: scale(1.05);
+        }
+        li {
+            transition: 0.2s;
+        }
+        li:hover {
+            background: #edf2f7;
+            transform: translateX(6px);
+        }
+        li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+        li.done span { 
+            text-decoration: line-through;
+            opacity: 0.5;
+        }
+        .actions {
+            display: flex;
+            gap: 6px;
+        }
+        .actions form,
+        .edit-form {
+            margin: 0;
+        }
+        .edit-form {
+            flex: 1;
+        }
+        .small {
+            display: inline-block;
+            padding: 6px 10px;
+            font-size: 14px;
+            background: #e2e8f0;
+            color: #2d3748;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+        }
+        .del {
+            background: #fed7d7;
+        }
+        .small:hover {
+            background: #cbd5e0;
+        }
+        .del:hover {
+            background: #feb2b2;
+        }
+
     </style>
 </head>
 <body>
     <div class="card">
         <h1>FocusList</h1>
-         <form>
-            <input type="text" placeholder="Add a task...">
-            <button type="button">Add</button>
-        </form>
-        <ul>
+         <form method="post">
+            <input type="text" name="task" placeholder="Add a task..." maxlength="60" required>
+            <button type="submit">Add</button>
+         </form>
+         <p>You have {{ tasks|length }} tasks</p>
+         {% if tasks %}
+         <ul>
             {% for task in tasks %}
-            <li>{{ task }}</li>
+            <li class="{{ 'done' if task.done else '' }}">
+                {% if task.id == editing_id %}
+                <form method="post" action="/edit/{{ task.id }}" class="edit-form">
+                <input type="text" name="task" value="{{ task.text }}" maxlength="60" required>
+                <button type="submit" class="small">Save</button>
+                </form>
+                {% else %}
+                <span>{{ task.text }}</span>
+                <div class="actions">
+                    <form method="post" action="/done/{{ task.id }}">
+                    <button type="submit" class="small">✅</button>
+                    </form>
+                    <a href="/edit/{{ task.id }}" class="small">✏️</a>
+                    <form method="post" action="/delete/{{ task.id }}">
+                        <button type="submit" class="small del">🗑️</button>
+                    </form>
+                </div>
+            {% endif %}
+            </li>
             {% endfor %}
-        </ul>    
-    </div>
+        </ul>
+         <form method="post" action="/clear">
+            <button type="submit" class="clear">Clear all</button>
+         </form>
+         {% else %}
+         <p>No tasks yet. Add one above!</p>
+         {% endif %}
+   </div>
 </body>
 </html>
