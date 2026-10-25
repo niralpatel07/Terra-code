@@ -127,6 +127,32 @@
         .del:hover {
             background: #feb2b2;
         }
+        select {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+        }
+        .p-high { border-left: 5px solid #e53e3e; }
+        .p-medium { border-left: 5px solid #ecc94b; }
+        .p-low { border-left: 5px solid #48bb78; }
+        .bulk {
+            display: flex;
+            gap: 8px;
+        }
+        .bulk form {
+            margin: 0;
+            flex: 1;
+        }
+        .bulk .clear {
+            width: 100%;
+        }
+        small { 
+            display: block;
+            color: #718096;
+            font-size: 12px;
+            margin-top: 4px;
+        }
 
     </style>
 </head>
@@ -135,20 +161,29 @@
         <h1>FocusList</h1>
          <form method="post">
             <input type="text" name="task" placeholder="Add a task..." maxlength="60" required>
+
+            <select name="priority">
+                <option value="high">High</option>
+                <option value="medium" selected>Medium</option>
+                <option value="low">Low</option>
+            </select>
+
             <button type="submit">Add</button>
          </form>
-         <p>You have {{ tasks|length }} tasks</p>
+         <p>{{ tasks|selectattr("done")|list|length }} of {{ tasks|length }} done</p>
          {% if tasks %}
          <ul>
             {% for task in tasks %}
-            <li class="{{ 'done' if task.done else '' }}">
+            <li class="{{ 'done' if task.done else '' }} p-{{ task.priority }}" >
                 {% if task.id == editing_id %}
                 <form method="post" action="/edit/{{ task.id }}" class="edit-form">
                 <input type="text" name="task" value="{{ task.text }}" maxlength="60" required>
                 <button type="submit" class="small">Save</button>
                 </form>
                 {% else %}
-                <span>{{ task.text }}</span>
+                <span>{{ task.text }}
+                    {% if task.created %}<small>Added {{ task.created }}</small>{% endif %}
+                </span>
                 <div class="actions">
                     <form method="post" action="/done/{{ task.id }}">
                     <button type="submit" class="small">✅</button>
@@ -162,12 +197,17 @@
             </li>
             {% endfor %}
         </ul>
-         <form method="post" action="/clear">
-            <button type="submit" class="clear">Clear all</button>
-         </form>
+        <div class="bulk">
+            <form method="post" action="/clear-done">
+                <button type="submit" class="clear">Clear completed</button>
+            </form>
+            <form method="post" action="/clear">
+                <button type="submit" class="clear">Clear all</button>
+            </form>
+        </div>
          {% else %}
          <p>No tasks yet. Add one above!</p>
          {% endif %}
-   </div>
+   </div> 
 </body>
 </html>
