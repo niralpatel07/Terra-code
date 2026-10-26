@@ -57,6 +57,14 @@
         }
         .stat { color: #4a5568; maargin-top: 20px; }
         a { color: #4f46e5; text-decoration: none; }
+        body.dark { background: linear-gradient(135deg, #1a202c, #2d3748); }
+        body.dark .card { background: #2d3748; }
+        body.dark h1, body.dark #display { color: #f7fafc; }
+        body.dark p, body.dark .stat { color: #a0aec0; }
+        body.dark input, body.dark select { background: #1a202c; color: #f7fafc; border-color: #4a5568; }
+        body.dark .modes button, body.dark .secondary { background: #4a5568; color: #f7fafc; }
+        body.dark .modes button.on { background: #4f46e5; }
+        body.dark a { color: #a5b4fc; }
     </style>
 </head>
 <body>
@@ -80,6 +88,7 @@
         </div>
 
     <p class="stat" id="stat">Today: {{ sessions_today }} sessions, {{ minutes_today }} min focused</p>
+    <p><button type="button" class="secondary" onclick="toggleDark()">Dark Mode</button></p>
     <a href="/">Back to tasks</a>
 </div>
 
@@ -195,6 +204,19 @@
         }
     }
     render();
+</script>
+<script>
+    function toggleDark() {
+        document.body.classList.toggle("dark");
+        try {
+            localStorage.setItem("dark", document.body.classList.contains("dark") ? "1" : "0");
+        } catch (e) {}
+    }
+    try {
+        if(localStorage.getItem("dark") === "1") {
+            document.body.classList.add("dark");
+        }
+    } catch (e) {}
 </script>
 </body>
 </html>
