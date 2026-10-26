@@ -153,24 +153,72 @@
             font-size: 12px;
             margin-top: 4px;
         }
-
+        input[type="date"] {
+            flex: none;
+        }
+        .filters {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .filters a {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            border-radius: 20px;
+            background: #e2e8f0;
+            color: #2d3748;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .filters a.on {
+            background: #4f46e5;
+            color: white;
+        }
+        .search {
+            margin-bottom: 16px;
+        }
+        small.late {
+            color: #e53e3e;
+            font-weight: bold;
+        }
+        form { 
+            flex-wrap: wrap;
+        }
+        input[type="date"] {
+            flex: 1 1 140px;
+            min-width: 0;
+        }
     </style>
 </head>
 <body>
     <div class="card">
         <h1>FocusList</h1>
+        <p style="text-align:center"><a href="/timer" class="small">Focus Timer</a></p>
+
          <form method="post">
             <input type="text" name="task" placeholder="Add a task..." maxlength="60" required>
-
             <select name="priority">
                 <option value="high">High</option>
                 <option value="medium" selected>Medium</option>
                 <option value="low">Low</option>
-            </select>
-
+            </select>           
+            <input type="date" name="due">
             <button type="submit">Add</button>
          </form>
-         <p>{{ tasks|selectattr("done")|list|length }} of {{ tasks|length }} done</p>
+
+         <p>{{ done_count }} of {{ total }} done{% if overdue %} - {{ overdue }} overdue{% endif %}</p>
+
+         <div class="filters">
+            <a href="/?view=all" class="{{'on' if view == 'all' else '' }}">All</a>
+            <a href="/?view=active" class="{{'on' if view == 'active' else ''}}">Active</a>
+            <a href="/?view=done" class="{{ 'on' if view == 'done' else '' }}">Done</a>
+        </div>
+        <form method="get" class="search">
+            <input type="text" name="q" value="{{ q }}" placeholder="Search tasks...">
+            <input type="hidden" name="view" value="{{ view }}">
+            <button type="submit">Search</button>
+        </form>    
          {% if tasks %}
          <ul>
             {% for task in tasks %}
@@ -183,8 +231,13 @@
                 {% else %}
                 <span>{{ task.text }}
                     {% if task.created %}<small>Added {{ task.created }}</small>{% endif %}
-                </span>
-                <div class="actions">
+                    {% if task.due %}
+                    <small class="{{ 'late' if task.due < today and not task.done else ''}}">
+                        Due {{ task.due }}{% if task.due < today and not task.done %} . overdue{% endif %} 
+                    </small>
+                    {% endif %}
+                </span>                    
+                    <div class="actions">
                     <form method="post" action="/done/{{ task.id }}">
                     <button type="submit" class="small">✅</button>
                     </form>
