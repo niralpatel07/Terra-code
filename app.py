@@ -2,6 +2,7 @@ import json
 import os
 from datetime import date, datetime
 
+
 from flask import Flask, render_template, request, redirect, jsonify 
 
 app = Flask(__name__)
@@ -174,4 +175,4 @@ def log_session():
     return jsonify(sessions_today=count, minutes_today=total)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
